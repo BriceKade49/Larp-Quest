@@ -7,7 +7,7 @@ import Pickups
 import gui_elements
 pygame.init()
 ds_width = 670
-ds_height = 673
+ds_height = 670
 ds = pygame.display.set_mode((ds_width, ds_height))
 Skeliton = pygame.image.load("Sprites\\SkeletonBow1.png")
 Projectial = pygame.image.load("Sprites\\Arrow.png")
@@ -581,14 +581,26 @@ while play == True:
         map1.EnemyDic["Skeleton"] = s
         map1.EnemyDic["WizBoss"] = w
 
-        map1.toFile("Rooms//"+oldRoom+".map",EnemyList,loot_dropper.dropped_list)
+        map1.toFile("Rooms//"+oldRoom+".map",EnemyList)
         ArrowList = []
-        map1.fromFile(newRoom)
-
-
         #Pickup saving
         for item in loot_dropper.dropped_list:
             DropRemoveList.append(item)
+        map1.fromFile(newRoom)
+        
+        for num in range(map1.PickupDic["pAmmo"]):
+            loot_dropper.dropped_list.append(["pAmmo",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+        for num in range(map1.PickupDic["sAmmo"]):
+            loot_dropper.dropped_list.append(["sAmmo",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+        for num in range(map1.PickupDic["mAmmo"]):
+            loot_dropper.dropped_list.append(["mAmmo",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+        for num in range(map1.PickupDic["miniGun"]):
+            loot_dropper.dropped_list.append(["miniGun",ds_width - 50,ds_height - 50,128,128])
+        for num in range(map1.PickupDic["key"]):
+            loot_dropper.dropped_list.append(["key",ds_width - 50,ds_height - 50,128,128])
+        for num in range(map1.PickupDic["HP"]):
+            loot_dropper.dropped_list.append(["HP",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+        
         
         #Enemy Spawning
         EnemyList=[] 
@@ -642,9 +654,25 @@ while play == True:
         map1.EnemyDic["Skeleton"] = s
         map1.EnemyDic["WizBoss"] = w
 
-        map1.toFile("Rooms//"+oldRoom+".map",EnemyList,loot_dropper.dropped_list)
+        map1.toFile("Rooms//"+oldRoom+".map",EnemyList)
         ArrowList = []
+        for item in loot_dropper.dropped_list:
+            DropRemoveList.append(item)
         map1.fromFile(newRoom)
+
+        for num in range(map1.PickupDic["pAmmo"]):
+            loot_dropper.dropped_list.append(["pAmmo",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+        for num in range(map1.PickupDic["sAmmo"]):
+            loot_dropper.dropped_list.append(["sAmmo",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+        for num in range(map1.PickupDic["mAmmo"]):
+            loot_dropper.dropped_list.append(["mAmmo",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+        for num in range(map1.PickupDic["miniGun"]):
+            loot_dropper.dropped_list.append(["miniGun",ds_width - 50,ds_height - 50,128,128])
+        for num in range(map1.PickupDic["key"]):
+            loot_dropper.dropped_list.append(["key",ds_width - 50,ds_height - 50,128,128])
+        for num in range(map1.PickupDic["HP"]):
+            loot_dropper.dropped_list.append(["HP",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+        
 
         #Enemy Spawning
         EnemyList=[] 
@@ -700,7 +728,24 @@ while play == True:
 
         map1.toFile("Rooms//"+oldRoom+".map",EnemyList)
         ArrowList = []
+        for item in loot_dropper.dropped_list:
+            DropRemoveList.append(item)
         map1.fromFile(newRoom)
+
+        for num in range(map1.PickupDic["pAmmo"]):
+            loot_dropper.dropped_list.append(["pAmmo",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+        for num in range(map1.PickupDic["sAmmo"]):
+            loot_dropper.dropped_list.append(["sAmmo",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+        for num in range(map1.PickupDic["mAmmo"]):
+            loot_dropper.dropped_list.append(["mAmmo",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+        for num in range(map1.PickupDic["miniGun"]):
+            loot_dropper.dropped_list.append(["miniGun",ds_width - 50,ds_height - 50,128,128])
+        for num in range(map1.PickupDic["key"]):
+            loot_dropper.dropped_list.append(["key",ds_width - 50,ds_height - 50,128,128])
+        for num in range(map1.PickupDic["HP"]):
+            loot_dropper.dropped_list.append(["HP",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+        
+
 
         #Enemy Spawning
         EnemyList=[] 
@@ -756,7 +801,25 @@ while play == True:
 
         map1.toFile("Rooms//"+oldRoom+".map",EnemyList)
         ArrowList = []
+        for item in loot_dropper.dropped_list:
+            DropRemoveList.append(item)
         map1.fromFile(newRoom)
+
+        for num in range(map1.PickupDic["pAmmo"]):
+            loot_dropper.dropped_list.append(["pAmmo",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+        for num in range(map1.PickupDic["sAmmo"]):
+            loot_dropper.dropped_list.append(["sAmmo",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+        for num in range(map1.PickupDic["mAmmo"]):
+            loot_dropper.dropped_list.append(["mAmmo",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+        for num in range(map1.PickupDic["miniGun"]):
+            loot_dropper.dropped_list.append(["miniGun",ds_width - 50,ds_height - 50,128,128])
+        for num in range(map1.PickupDic["key"]):
+            loot_dropper.dropped_list.append(["key",ds_width - 50,ds_height - 50,128,128])
+        for num in range(map1.PickupDic["HP"]):
+            loot_dropper.dropped_list.append(["HP",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+        
+
+
 
         #Enemy Spawning
         EnemyList=[] 
@@ -857,11 +920,20 @@ while play == True:
                 if UI.health < 6:
                     UI.health += 1
                 DropRemoveList.append(item)
-            elif item[0] == "Pistol":
+            elif item[0] == "pAmmo":
                 UI.add_pistol_ammo()
                 DropRemoveList.append(item)
-            elif item[0] == "Shotgun":
+            elif item[0] == "sAmmo":
                 UI.add_shotgun_ammo()
+                DropRemoveList.append(item)
+            elif item[0] == "mAmmo":
+                #TODO: add UI.add_minigun_ammo()
+                DropRemoveList.append(item)
+            elif item[0] == "mini":
+                #TODO: add mini gun to wepons list
+                DropRemoveList.append(item)
+            elif item[0] == "key":
+                #TODO: add key to invitory
                 DropRemoveList.append(item)
 
                 

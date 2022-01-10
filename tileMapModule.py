@@ -142,6 +142,7 @@ class Tilemap(object):
                 self.EnemyDic=json.loads(rhs)
             if lhs=="PickupDic":
                 self.PickupDic=json.loads(rhs)
+                print(self.PickupDic)
             if lhs=="tileMapLine":
                 mapstring+=rhs+"\n"
             if lhs=="textureFile":
