@@ -13,6 +13,7 @@ Skeliton = pygame.image.load("Sprites\\SkeletonBow1.png")
 Projectial = pygame.image.load("Sprites\\Arrow.png")
 Hero_Pistol = pygame.image.load("Sprites\\Hero_Pistol.png")
 Hero_Shotgun = pygame.image.load("Sprites\\Hero_Shotgun.png")
+Hero_Sword = pygame.image.load("Sprites\\Hero_Sowrd.png")
 Bullet = pygame.image.load("Sprites\\Bullet.png")
 UIShell = pygame.image.load("Sprites\\UIShell.png")
 Heart_6 = pygame.image.load("Sprites\\Heart_6.png")
@@ -270,19 +271,24 @@ class Player(object):
         self.canShoot = True
         self.Hero_Pistol = Hero_Pistol
         self.Hero_Shotgun = Hero_Shotgun
+        self.Hero_Sword = Hero_Sword
         self.colliderect = None
         self.flip = None
-        
+        self.sAttck = 0
 
     def move(self, keys,dt,mx):
         if mx > self.x:
             self.flip = True
-            if UI.GunPicked == 1:
+            if(self.sAttck>0):
+                self.Hero_Sword = pygame.transform.flip(Hero_Sword,True,False)
+            elif UI.GunPicked == 1:
                 self.Hero_Pistol = pygame.transform.flip(Hero_Pistol,True,False)
             elif UI.GunPicked == 2:
                 self.Hero_Shotgun = pygame.transform.flip(Hero_Shotgun, True, False)
         else:
             self.flip = False
+            if(self.sAttck>0):
+                self.Hero_Sword = pygame.transform.flip(Hero_Sword,False,False)
             if UI.GunPicked == 1:
                 self.Hero_Pistol = pygame.transform.flip(Hero_Pistol,False,False)
             elif UI.GunPicked == 2:
@@ -304,10 +310,19 @@ class Player(object):
         self.dy = 0
 
     def render(self, ds):
-        if UI.GunPicked == 1:
-            self.colliderect = ds.blit(self.Hero_Pistol,(self.x,self.y))
-        elif UI.GunPicked == 2:
-            self.colliderect = ds.blit(self.Hero_Shotgun, (self.x, self.y))
+        if(self.sAttck>0):
+            self.swordAttack(ds)
+        else:
+            if UI.GunPicked == 1:
+                self.colliderect = ds.blit(self.Hero_Pistol,(self.x,self.y))
+            elif UI.GunPicked == 2:
+                self.colliderect = ds.blit(self.Hero_Shotgun, (self.x, self.y))
+
+            
+    def swordAttack(self, ds):
+        self.colliderect = ds.blit(self.Hero_Sword,(self.x,self.y))
+        self.sAttck -= 1
+
 class Shoot(object):
     def __init__(self,x,y,angle,speed = 5):
         if player.flip == True:
@@ -457,9 +472,9 @@ for num in range(map1.EnemyDic["WizBoss"]):
     EnemyList.append(DarkWizard(shotDist = 350,shotTime = 300,sprite = DarkWizard1, health = 30))
 while play == True:
     SwordAttack = False
-    if(SwordTimer >= 0):
-        SwordTimer-=time
     dt = fps_clock.tick(60)
+    if(SwordTimer > 0):
+        SwordTimer-=dt
     time += 1
     mx, my = pygame.mouse.get_pos()
     #ds.blit(BackgroundImage,(0,0))  
@@ -872,16 +887,21 @@ while play == True:
                 UI.SwitchGun()
             if m3:
                 #sword attack here
-                SwordAttack = True
+                if(SwordTimer<=0):
+                     SwordAttack = True
+                     player.swordAttack(ds)
+                     SwordTimer = 1000
+                     player.sAttck = 10
+                     
 
     for Enemy in EnemyList:
         Enemy.move(player.x, player.y)
         Enemy.render(player.x, player.y)
         if(SwordAttack):
-            if (abs((Enemy.x - player.x)+(Enemy.y - player.y))<=100) and SwordTimer<=0:
+            if (abs((Enemy.x - player.x)+(Enemy.y - player.y))<=100):
                 print("sword attack hit")
                 Enemy.health-=1
-                SwordTimer = 5000
+                
                 
         #for otherSkelington in EnemyList:
             #if Skelington.collide.colliderect(otherSkelington.collide):
