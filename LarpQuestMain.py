@@ -5,6 +5,20 @@ import vector
 import tileMapModule
 import Pickups
 import gui_elements
+import os
+import shutil
+
+# fetch all files
+for file_name in os.listdir(r"Rooms\\"):
+    # construct full file path
+    source = r"Rooms\\" + file_name
+    destination = r"NewRooms\\" + file_name
+    # copy only files
+    if os.path.isfile(source):
+        shutil.copy(source, destination)
+        print('copied', file_name)
+
+     
 pygame.init()
 ds_width = 670
 ds_height = 670
@@ -57,6 +71,9 @@ map1=tileMapModule.Tilemap(renderSurface=ds)
 map1.fromFile("R1C1")
 RoomCol= 1
 RoomRow= 1
+
+
+   
 class StoryText(object):
     def __init__(self,FirstText,SecondText,ThirdText):
         self.x = ds_height/9
@@ -596,7 +613,7 @@ while play == True:
         map1.EnemyDic["Skeleton"] = s
         map1.EnemyDic["WizBoss"] = w
 
-        map1.toFile("Rooms//"+oldRoom+".map",EnemyList)
+        map1.toFile("NewRooms//"+oldRoom+".map",EnemyList)
         ArrowList = []
         #Pickup saving
         for item in loot_dropper.dropped_list:
@@ -669,7 +686,7 @@ while play == True:
         map1.EnemyDic["Skeleton"] = s
         map1.EnemyDic["WizBoss"] = w
 
-        map1.toFile("Rooms//"+oldRoom+".map",EnemyList)
+        map1.toFile("NewRooms//"+oldRoom+".map",EnemyList)
         ArrowList = []
         for item in loot_dropper.dropped_list:
             DropRemoveList.append(item)
@@ -741,7 +758,7 @@ while play == True:
         map1.EnemyDic["Skeleton"] = s
         map1.EnemyDic["WizBoss"] = w
 
-        map1.toFile("Rooms//"+oldRoom+".map",EnemyList)
+        map1.toFile("NewRooms//"+oldRoom+".map",EnemyList)
         ArrowList = []
         for item in loot_dropper.dropped_list:
             DropRemoveList.append(item)
@@ -814,7 +831,7 @@ while play == True:
         map1.EnemyDic["Skeleton"] = s
         map1.EnemyDic["WizBoss"] = w
 
-        map1.toFile("Rooms//"+oldRoom+".map",EnemyList)
+        map1.toFile("NewRooms//"+oldRoom+".map",EnemyList)
         ArrowList = []
         for item in loot_dropper.dropped_list:
             DropRemoveList.append(item)
@@ -1000,3 +1017,11 @@ while play == True:
     #pygame.draw.rect(ds,(255,0,0),player.colliderect)
     pygame.display.update()
 pygame.display.quit()
+
+for file_name in os.listdir(r"NewRooms\\"):
+    # construct full file path
+    source = r"NewRooms\\" + file_name
+    # copy only files
+    if os.path.isfile(source):
+        os.remove(source)
+        print('removed', file_name)

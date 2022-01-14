@@ -116,7 +116,7 @@ class Tilemap(object):
         print("ran"+filename)
         '''create the tilemap from the file that is specified by the filename.'''
         #read individual lines from file
-        fhandle=open("Rooms\\"+filename+".map","r")
+        fhandle=open("NewRooms\\"+filename+".map","r")
         lines=fhandle.readlines()
         fhandle.close()
         mapstring=""
