@@ -16,7 +16,7 @@ for file_name in os.listdir(r"Rooms\\"):
     # copy only files
     if os.path.isfile(source):
         shutil.copy(source, destination)
-        print('copied', file_name)
+        #print('copied', file_name)
 
      
 pygame.init()
@@ -27,9 +27,11 @@ Skeliton = pygame.image.load("Sprites\\SkeletonBow1.png")
 Projectial = pygame.image.load("Sprites\\Arrow.png")
 Hero_Pistol = pygame.image.load("Sprites\\Hero_Pistol.png")
 Hero_Shotgun = pygame.image.load("Sprites\\Hero_Shotgun.png")
+Hero_Minigun = pygame.image.load("Sprites\\Hero_Mini.png")
 Hero_Sword = pygame.image.load("Sprites\\Hero_Sowrd.png")
 Bullet = pygame.image.load("Sprites\\Bullet.png")
 UIShell = pygame.image.load("Sprites\\UIShell.png")
+UIMini = pygame.image.load("Sprites\\UIMini.png")
 Heart_6 = pygame.image.load("Sprites\\Heart_6.png")
 Heart_5 = pygame.image.load("Sprites\\Heart_5.png")
 Heart_4 = pygame.image.load("Sprites\\Heart_4.png")
@@ -39,6 +41,7 @@ Heart_1 = pygame.image.load("Sprites\\Heart_1.png")
 UIBullets = pygame.image.load("Sprites\\UIBullet.png")
 UIPistol = pygame.image.load("Sprites\\Pistol.png")
 UIShotgun = pygame.image.load("Sprites\\shotgun.png")
+UIMinigun = pygame.image.load("Sprites\\MiniGun.png")
 TalkingScroll = pygame.image.load("Sprites\\Scroll.png")
 FireBall1 = pygame.image.load("Sprites\\FireBall.png")
 DarkWizard1 = pygame.image.load("Sprites\\DarkWizard.png")
@@ -64,9 +67,11 @@ reloadFont = pygame.font.SysFont("Fonts\\Cardinal.ttf", 40)
 loot_dropper = Pickups.Pickup()
 fps_clock=pygame.time.Clock()
 time = 0
+miniGunTimer = 0
 TitleScreen = True
 play = False
 controls = False
+minigunshotting = False
 map1=tileMapModule.Tilemap(renderSurface=ds)
 map1.fromFile("R1C1")
 RoomCol= 1
@@ -90,24 +95,32 @@ class StoryText(object):
         ds.blit(Text2,(ds_height-13*(ds_width/16),ds_height-5*(ds_height/17)))
         ds.blit(Text3,(ds_height-13*(ds_width/16),ds_height-5*(ds_height/25)))
 class UIClass(object):
-    def __init__(self, pistol_bullet_count=100, pistol_mag_size=6, shotgun_shell_count = 100, shotgun_mag_size = 2, reload_time=200, Health=6, GunPicked=2):
+    def __init__(self, pistol_bullet_count=100, pistol_mag_size=6, shotgun_shell_count = 100, shotgun_mag_size = 2, minigun_mag_size = 16, minigun_bullet_count = 50, reload_time=200, Health=6, GunPicked=1):
         self.PBCount = pistol_bullet_count
         self.PMSize = pistol_mag_size
         self.PSLeft = pistol_mag_size
         self.SSCount = shotgun_shell_count
         self.SMSize = shotgun_mag_size
         self.SSLeft = shotgun_mag_size
+        self.MBCount = minigun_bullet_count
+        self.MMSize = minigun_mag_size
+        self.MBLeft = minigun_mag_size
         self.reload_time = reload_time
         self.wait_time = reload_time
         self.pistol_remaining = 0
         self.shotgun_remaining = 0
+        self.minigun_remaining = 0
         self.health = Health
         self.GunPicked = GunPicked
+        self.ShotGun = True
+        self.MiniGun = True
     def ShootGun(self):
         if self.GunPicked == 1:
             self.PSLeft -= 1
         elif self.GunPicked == 2:
             self.SSLeft -= 1
+        elif self.GunPicked == 3:
+            self.MBLeft -= 1
     def auto_pistol_reload(self):
         if self.PBCount >= self.PMSize - self.pistol_remaining:
             self.PBCount -= self.PMSize - self.pistol_remaining
@@ -136,8 +149,21 @@ class UIClass(object):
             self.SBCount = 0
             self.reload_time = self.wait_time
             self.shotgun_remaining = 0
-
-
+    def auto_minigun_reload(self): 
+        if self.MBCount >= self.MMSize - self.pistol_remaining:
+            self.MBCount -= self.MMSize - self.pistol_remaining
+            self.MBLeft += self.MMSize
+            self.reload_time = self.wait_time
+            self.pistol_remaining = 0
+        elif self.MBCount == 0:
+            self.MBLeft = 0
+            self.reload_time = self.wait_time
+        elif self.MBCount < self.MMSize - self.minigun_remaining:
+            self.MBLeft += self.MBCount
+            self.MBCount = 0
+            self.reload_time = self.wait_time
+            self.pistol_remaining = 0
+            
     def self_reload(self):
         if self.GunPicked == 1:
             self.pistol_remaining = self.PSLeft
@@ -145,6 +171,9 @@ class UIClass(object):
         if self.GunPicked == 2:
             self.shotgun_remaining = self.SSLeft
             self.SSLeft = 0
+        if self.GunPicked == 3:
+            self.minigun_remaining = self.MBLeft
+            self.MBLeft = 0
 
 
     def pistol_wait(self):
@@ -165,14 +194,30 @@ class UIClass(object):
             self.reload_time -= 1 + self.shotgun_remaining
             reloadingText = reloadFont.render("reloading...", 0, (169, 177, 188))
             ds.blit(reloadingText,(ds_height-13*(ds_width/20),ds_height-3*(ds_height/20)))
+    def minigun_wait(self):
+        if self.minigun_remaining == 0:
+            self.reload_time -= 1
+            reloadingText = reloadFont.render("reloading...", 0, (169, 177, 188))
+            ds.blit(reloadingText,(ds_height-13*(ds_width/20),ds_height-3*(ds_height/20)))
+        else:
+            self.reload_time -= 1 + self.shotgun_remaining
+            reloadingText = reloadFont.render("reloading...", 0, (169, 177, 188))
+            ds.blit(reloadingText,(ds_height-13*(ds_width/20),ds_height-3*(ds_height/20)))
     def add_pistol_ammo(self):
         self.PBCount += 6
     def add_shotgun_ammo(self):
         self.SSCount += 2
+    def add_minigun_ammo(self):
+        self.MBCount += 16
     def SwitchGun(self):
-        if self.GunPicked == 1:
+        if self.GunPicked == 1 and self.ShotGun == True:
             self.GunPicked = 2
         elif self.GunPicked == 2:
+            if(self.MiniGun==True):
+                self.GunPicked = 3
+            else:
+                self.GunPicked = 1
+        elif self.GunPicked == 3:
             self.GunPicked = 1
     def TakeDamage(self):
         self.health -= 1
@@ -188,7 +233,13 @@ class UIClass(object):
             ds.blit(UIShell, (ds_width - 8 * (ds_width / 20), ds_height - 2 * (ds_height / 20) - 20))
             font_render = sys_font.render(str(self.SSLeft) + ":" + str(self.SSCount), 0, (169, 177, 188))
             ds.blit(UIShotgun, (ds_width / 30, ds_height - 2 * (ds_height / 20) - 10))
+        elif self.GunPicked == 3:
+            ds.blit(UIMini, (ds_width - 8 * (ds_width / 20), ds_height - 2 * (ds_height / 20) - 20))
+            font_render = sys_font.render(str(self.MBLeft) + ":" + str(self.MBCount), 0, (169, 177, 188))
+            ds.blit(UIMinigun, (ds_width / 30, ds_height - 2 * (ds_height / 20) - 10))
+
         ds.blit(font_render, (ds_width - 5 * (ds_width / 20), ds_height - 2 * (ds_height / 20)))
+                                
         if self.health == 6:
             ds.blit(Heart_6,(0,0))
         if self.health == 5:
@@ -289,6 +340,7 @@ class Player(object):
         self.Hero_Pistol = Hero_Pistol
         self.Hero_Shotgun = Hero_Shotgun
         self.Hero_Sword = Hero_Sword
+        self.Hero_Minigun = Hero_Minigun
         self.colliderect = None
         self.flip = None
         self.sAttck = 0
@@ -302,14 +354,18 @@ class Player(object):
                 self.Hero_Pistol = pygame.transform.flip(Hero_Pistol,True,False)
             elif UI.GunPicked == 2:
                 self.Hero_Shotgun = pygame.transform.flip(Hero_Shotgun, True, False)
+            elif UI.GunPicked == 3:
+                self.Hero_Minigun = pygame.transform.flip(Hero_Minigun, True, False)
         else:
             self.flip = False
             if(self.sAttck>0):
                 self.Hero_Sword = pygame.transform.flip(Hero_Sword,False,False)
-            if UI.GunPicked == 1:
+            elif UI.GunPicked == 1:
                 self.Hero_Pistol = pygame.transform.flip(Hero_Pistol,False,False)
             elif UI.GunPicked == 2:
                 self.Hero_Shotgun = pygame.transform.flip(Hero_Shotgun, False, False)
+            elif UI.GunPicked == 3:
+                self.Hero_Minigun = pygame.transform.flip(Hero_Minigun, False, False)
         skirt = 1
         if keys[pygame.K_w]:
             self.dy = -skirt
@@ -334,6 +390,9 @@ class Player(object):
                 self.colliderect = ds.blit(self.Hero_Pistol,(self.x,self.y))
             elif UI.GunPicked == 2:
                 self.colliderect = ds.blit(self.Hero_Shotgun, (self.x, self.y))
+            elif UI.GunPicked == 3:
+                self.colliderect = ds.blit(self.Hero_Minigun, (self.x, self.y))
+            
 
             
     def swordAttack(self, ds):
@@ -472,17 +531,17 @@ UI = UIClass()
 Message = StoryText("You have been sucked into the","Dark Wizards midevil world. ","Find and Defeat him to excape")
 textOn = False
 for num in range(map1.PickupDic["pAmmo"]):
-    loot_dropper.dropped_list.append(["pAmmo",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+    loot_dropper.dropped_list.append(["pAmmo",random.randint(0,ds_width-64),random.randint(0,ds_height-64),128,128])
 for num in range(map1.PickupDic["sAmmo"]):
-    loot_dropper.dropped_list.append(["sAmmo",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+    loot_dropper.dropped_list.append(["sAmmo",random.randint(0,ds_width-64),random.randint(0,ds_height-64),128,128])
 for num in range(map1.PickupDic["mAmmo"]):
-    loot_dropper.dropped_list.append(["mAmmo",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+    loot_dropper.dropped_list.append(["mAmmo",random.randint(0,ds_width-64),random.randint(0,ds_height-64),128,128])
 for num in range(map1.PickupDic["miniGun"]):
     loot_dropper.dropped_list.append(["miniGun",ds_width - 50,ds_height - 50,128,128])
 for num in range(map1.PickupDic["key"]):
     loot_dropper.dropped_list.append(["key",ds_width - 50,ds_height - 50,128,128])
 for num in range(map1.PickupDic["HP"]):
-        loot_dropper.dropped_list.append(["HP",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+        loot_dropper.dropped_list.append(["HP",random.randint(0,ds_width-64),random.randint(0,ds_height-64),128,128])
 for num in range(map1.EnemyDic["Skeleton"]):
     EnemyList.append(SkelingtonSpawner())
 for num in range(map1.EnemyDic["WizBoss"]):
@@ -529,7 +588,7 @@ while play == True:
         player.x = old_x
         player.y = old_y
         
-    if "WW" in map1.checkTileMapCollision(player.x, player.y, 10, 32):
+    if "WW" in map1.checkTileMapCollision(player.x, player.y + 50, 10, 32):
         player.x = old_x
         player.y = old_y
 
@@ -563,7 +622,7 @@ while play == True:
             enemy.x = enemy.ox
             enemy.y = enemy.oy
         
-        if "WW" in map1.checkTileMapCollision(enemy.x, enemy.y, 10, 32):
+        if "WW" in map1.checkTileMapCollision(enemy.x, enemy.y + 50, 10, 32):
             enemy.x = enemy.ox
             enemy.y = enemy.oy
 
@@ -621,17 +680,17 @@ while play == True:
         map1.fromFile(newRoom)
         
         for num in range(map1.PickupDic["pAmmo"]):
-            loot_dropper.dropped_list.append(["pAmmo",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+            loot_dropper.dropped_list.append(["pAmmo",random.randint(0,ds_width-64),random.randint(0,ds_height-64),128,128])
         for num in range(map1.PickupDic["sAmmo"]):
-            loot_dropper.dropped_list.append(["sAmmo",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+            loot_dropper.dropped_list.append(["sAmmo",random.randint(0,ds_width-64),random.randint(0,ds_height-64),128,128])
         for num in range(map1.PickupDic["mAmmo"]):
-            loot_dropper.dropped_list.append(["mAmmo",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+            loot_dropper.dropped_list.append(["mAmmo",random.randint(0,ds_width-64),random.randint(0,ds_height-64),128,128])
         for num in range(map1.PickupDic["miniGun"]):
             loot_dropper.dropped_list.append(["miniGun",ds_width - 50,ds_height - 50,128,128])
         for num in range(map1.PickupDic["key"]):
             loot_dropper.dropped_list.append(["key",ds_width - 50,ds_height - 50,128,128])
         for num in range(map1.PickupDic["HP"]):
-            loot_dropper.dropped_list.append(["HP",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+            loot_dropper.dropped_list.append(["HP",random.randint(0,ds_width-64),random.randint(0,ds_height-64),128,128])
         
         
         #Enemy Spawning
@@ -693,17 +752,17 @@ while play == True:
         map1.fromFile(newRoom)
 
         for num in range(map1.PickupDic["pAmmo"]):
-            loot_dropper.dropped_list.append(["pAmmo",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+            loot_dropper.dropped_list.append(["pAmmo",random.randint(0,ds_width-64),random.randint(0,ds_height-64),128,128])
         for num in range(map1.PickupDic["sAmmo"]):
-            loot_dropper.dropped_list.append(["sAmmo",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+            loot_dropper.dropped_list.append(["sAmmo",random.randint(0,ds_width-64),random.randint(0,ds_height-64),128,128])
         for num in range(map1.PickupDic["mAmmo"]):
-            loot_dropper.dropped_list.append(["mAmmo",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+            loot_dropper.dropped_list.append(["mAmmo",random.randint(0,ds_width-64),random.randint(0,ds_height-64),128,128])
         for num in range(map1.PickupDic["miniGun"]):
             loot_dropper.dropped_list.append(["miniGun",ds_width - 50,ds_height - 50,128,128])
         for num in range(map1.PickupDic["key"]):
             loot_dropper.dropped_list.append(["key",ds_width - 50,ds_height - 50,128,128])
         for num in range(map1.PickupDic["HP"]):
-            loot_dropper.dropped_list.append(["HP",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+            loot_dropper.dropped_list.append(["HP",random.randint(0,ds_width-64),random.randint(0,ds_height-64),128,128])
         
 
         #Enemy Spawning
@@ -765,17 +824,17 @@ while play == True:
         map1.fromFile(newRoom)
 
         for num in range(map1.PickupDic["pAmmo"]):
-            loot_dropper.dropped_list.append(["pAmmo",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+            loot_dropper.dropped_list.append(["pAmmo",random.randint(0,ds_width-64),random.randint(0,ds_height-64),128,128])
         for num in range(map1.PickupDic["sAmmo"]):
-            loot_dropper.dropped_list.append(["sAmmo",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+            loot_dropper.dropped_list.append(["sAmmo",random.randint(0,ds_width-64),random.randint(0,ds_height-64),128,128])
         for num in range(map1.PickupDic["mAmmo"]):
-            loot_dropper.dropped_list.append(["mAmmo",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+            loot_dropper.dropped_list.append(["mAmmo",random.randint(0,ds_width-64),random.randint(0,ds_height-64),128,128])
         for num in range(map1.PickupDic["miniGun"]):
             loot_dropper.dropped_list.append(["miniGun",ds_width - 50,ds_height - 50,128,128])
         for num in range(map1.PickupDic["key"]):
             loot_dropper.dropped_list.append(["key",ds_width - 50,ds_height - 50,128,128])
         for num in range(map1.PickupDic["HP"]):
-            loot_dropper.dropped_list.append(["HP",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
+            loot_dropper.dropped_list.append(["HP",random.randint(0,ds_width-64),random.randint(0,ds_height-64),128,128])
         
 
 
@@ -886,8 +945,11 @@ while play == True:
                 UI.add_pistol_ammo()
             if keys[pygame.K_o]:
                 UI.add_shotgun_ammo()
+        if events.type == pygame.MOUSEBUTTONUP:
+            minigunshotting = False
         if events.type == pygame.MOUSEBUTTONDOWN:
-            m1,m2,m3 = pygame.mouse.get_pressed()
+            m1,m2,m3 = pygame.mouse.get_pressed(3)
+            #mm1,mm2,mm3 = pygame
             if m1:
                 angle = math.atan2((my - player.y),(mx - player.x))
                 if UI.PSLeft > 0 and UI.GunPicked == 1:
@@ -900,6 +962,10 @@ while play == True:
                     BulletList.append(ShotGunShoot(player.x, player.y,angle))
                     BulletList.append(ShotGunShoot(player.x, player.y,angle+0.2))
                     BulletList.append(ShotGunShoot(player.x, player.y, angle-0.2))
+                if UI.MBLeft > 0 and UI.GunPicked == 3:
+                    minigunshotting = True
+                    
+
             if m2:
                 UI.SwitchGun()
             if m3:
@@ -909,8 +975,13 @@ while play == True:
                      player.swordAttack(ds)
                      SwordTimer = 1000
                      player.sAttck = 10
-                     
-
+    if(miniGunTimer>0):
+        miniGunTimer-=dt
+    if(minigunshotting == True and UI.MBLeft > 0 and UI.GunPicked == 3 and miniGunTimer<=0):
+        angle = math.atan2((my - player.y),(mx - player.x))
+        UI.ShootGun()
+        BulletList.append(Shoot(player.x, player.y, angle))
+        miniGunTimer = 100
     for Enemy in EnemyList:
         Enemy.move(player.x, player.y)
         Enemy.render(player.x, player.y)
@@ -1007,6 +1078,12 @@ while play == True:
                 UI.shotgun_wait()
                 if UI.reload_time < 0:
                     UI.auto_shotgun_reload()
+    if UI.MBLeft == 0:
+        if UI.GunPicked == 3:
+            if UI.MBCount > 0:
+                UI.minigun_wait()
+                if UI.reload_time < 0:
+                    UI.auto_minigun_reload()
 
 
 
@@ -1024,4 +1101,4 @@ for file_name in os.listdir(r"NewRooms\\"):
     # copy only files
     if os.path.isfile(source):
         os.remove(source)
-        print('removed', file_name)
+        #print('removed', file_name)
