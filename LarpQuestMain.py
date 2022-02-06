@@ -29,6 +29,7 @@ Hero_Pistol = pygame.image.load("Sprites\\Hero_Pistol.png")
 Hero_Shotgun = pygame.image.load("Sprites\\Hero_Shotgun.png")
 Hero_Minigun = pygame.image.load("Sprites\\Hero_Mini.png")
 Hero_Sword = pygame.image.load("Sprites\\Hero_Sowrd.png")
+Hero_Bare = pygame.image.load("Sprites\\Hero_Bare.png")
 Bullet = pygame.image.load("Sprites\\Bullet.png")
 UIShell = pygame.image.load("Sprites\\UIShell.png")
 UIMini = pygame.image.load("Sprites\\UIMini.png")
@@ -42,7 +43,7 @@ UIBullets = pygame.image.load("Sprites\\UIBullet.png")
 UIPistol = pygame.image.load("Sprites\\Pistol.png")
 UIShotgun = pygame.image.load("Sprites\\shotgun.png")
 UIMinigun = pygame.image.load("Sprites\\MiniGun.png")
-TalkingScroll = pygame.image.load("Sprites\\Scroll.png")
+TalkingScroll = pygame.image.load("Sprites\\Scroll2.0.png")
 FireBall1 = pygame.image.load("Sprites\\FireBall.png")
 DarkWizard1 = pygame.image.load("Sprites\\DarkWizard.png")
 Controls = pygame.image.load("Sprites\\controls.png")
@@ -72,6 +73,9 @@ TitleScreen = True
 play = False
 controls = False
 minigunshotting = False
+SwordInstructions = True
+PistalInstructions = True
+Instructions = True
 map1=tileMapModule.Tilemap(renderSurface=ds)
 map1.fromFile("R1C1")
 RoomCol= 1
@@ -81,7 +85,7 @@ RoomRow= 1
    
 class StoryText(object):
     def __init__(self,FirstText,SecondText,ThirdText):
-        self.x = ds_height/9
+        self.x = ds_height/19
         self.y = 13*(ds_height/20)
         self.firstText = FirstText
         self.secondText = SecondText
@@ -91,9 +95,9 @@ class StoryText(object):
         Text2 = reloadFont.render(self.firstText, 0, (56, 55, 53))
         Text = reloadFont.render(self.secondText, 0, (56, 55, 53))
         Text3 = reloadFont.render(self.thirdText, 0, (56, 55, 53))
-        ds.blit(Text,(ds_height-13*(ds_width/16),ds_height-5*(ds_height/20)))
-        ds.blit(Text2,(ds_height-13*(ds_width/16),ds_height-5*(ds_height/17)))
-        ds.blit(Text3,(ds_height-13*(ds_width/16),ds_height-5*(ds_height/25)))
+        ds.blit(Text,(ds_height-13*(ds_width/15),ds_height-5*(ds_height/20)))
+        ds.blit(Text2,(ds_height-13*(ds_width/15),ds_height-5*(ds_height/17)))
+        ds.blit(Text3,(ds_height-13*(ds_width/15),ds_height-5*(ds_height/25)))
 class UIClass(object):
     def __init__(self, pistol_bullet_count=100, pistol_mag_size=6, shotgun_shell_count = 100, shotgun_mag_size = 2, minigun_mag_size = 16, minigun_bullet_count = 50, reload_time=200, Health=6, GunPicked=1):
         self.PBCount = pistol_bullet_count
@@ -112,8 +116,9 @@ class UIClass(object):
         self.minigun_remaining = 0
         self.health = Health
         self.GunPicked = GunPicked
-        self.ShotGun = True
-        self.MiniGun = True
+        self.ShotGun = False
+        self.MiniGun = False
+        self.pistel = False
     def ShootGun(self):
         if self.GunPicked == 1:
             self.PSLeft -= 1
@@ -224,21 +229,21 @@ class UIClass(object):
         if self.health < 0:
             self.health == 0
     def render(self):
+        if self.pistel == True:
+            if self.GunPicked == 1:
+                ds.blit(UIBullets,(ds_width -8*(ds_width/20),ds_height-2*(ds_height/20)-10))
+                font_render = sys_font.render(str(self.PSLeft) + ":" + str(self.PBCount), 0, (169, 177, 188))
+                ds.blit(UIPistol, (ds_width / 30, ds_height-2*(ds_height/20)-10))
+            elif self.GunPicked == 2:
+                ds.blit(UIShell, (ds_width - 8 * (ds_width / 20), ds_height - 2 * (ds_height / 20) - 20))
+                font_render = sys_font.render(str(self.SSLeft) + ":" + str(self.SSCount), 0, (169, 177, 188))
+                ds.blit(UIShotgun, (ds_width / 30, ds_height - 2 * (ds_height / 20) - 10))
+            elif self.GunPicked == 3:
+                ds.blit(UIMini, (ds_width - 8 * (ds_width / 20), ds_height - 2 * (ds_height / 20) - 10))
+                font_render = sys_font.render(str(self.MBLeft) + ":" + str(self.MBCount), 0, (169, 177, 188))
+                ds.blit(UIMinigun, (ds_width / 30, ds_height - 2 * (ds_height / 20) - 10))
 
-        if self.GunPicked == 1:
-            ds.blit(UIBullets,(ds_width -8*(ds_width/20),ds_height-2*(ds_height/20)-10))
-            font_render = sys_font.render(str(self.PSLeft) + ":" + str(self.PBCount), 0, (169, 177, 188))
-            ds.blit(UIPistol, (ds_width / 30, ds_height-2*(ds_height/20)-10))
-        elif self.GunPicked == 2:
-            ds.blit(UIShell, (ds_width - 8 * (ds_width / 20), ds_height - 2 * (ds_height / 20) - 20))
-            font_render = sys_font.render(str(self.SSLeft) + ":" + str(self.SSCount), 0, (169, 177, 188))
-            ds.blit(UIShotgun, (ds_width / 30, ds_height - 2 * (ds_height / 20) - 10))
-        elif self.GunPicked == 3:
-            ds.blit(UIMini, (ds_width - 8 * (ds_width / 20), ds_height - 2 * (ds_height / 20) - 20))
-            font_render = sys_font.render(str(self.MBLeft) + ":" + str(self.MBCount), 0, (169, 177, 188))
-            ds.blit(UIMinigun, (ds_width / 30, ds_height - 2 * (ds_height / 20) - 10))
-
-        ds.blit(font_render, (ds_width - 5 * (ds_width / 20), ds_height - 2 * (ds_height / 20)))
+            ds.blit(font_render, (ds_width - 5 * (ds_width / 20)-10, ds_height - 2 * (ds_height / 20)))
                                 
         if self.health == 6:
             ds.blit(Heart_6,(0,0))
@@ -341,13 +346,17 @@ class Player(object):
         self.Hero_Shotgun = Hero_Shotgun
         self.Hero_Sword = Hero_Sword
         self.Hero_Minigun = Hero_Minigun
+        self.Hero_Bare = Hero_Bare
         self.colliderect = None
         self.flip = None
         self.sAttck = 0
+        self.swordOnly = True
 
     def move(self, keys,dt,mx):
         if mx > self.x:
             self.flip = True
+            if(self.swordOnly==True):
+                self.Hero_Bare = pygame.transform.flip(Hero_Bare,True,False)
             if(self.sAttck>0):
                 self.Hero_Sword = pygame.transform.flip(Hero_Sword,True,False)
             elif UI.GunPicked == 1:
@@ -358,6 +367,8 @@ class Player(object):
                 self.Hero_Minigun = pygame.transform.flip(Hero_Minigun, True, False)
         else:
             self.flip = False
+            if(self.swordOnly==True):
+                self.Hero_Bare = pygame.transform.flip(Hero_Bare,False,False)
             if(self.sAttck>0):
                 self.Hero_Sword = pygame.transform.flip(Hero_Sword,False,False)
             elif UI.GunPicked == 1:
@@ -383,15 +394,21 @@ class Player(object):
         self.dy = 0
 
     def render(self, ds):
-        if(self.sAttck>0):
-            self.swordAttack(ds)
+        if self.swordOnly == True:
+            if(self.sAttck>0):
+                self.swordAttack(ds)
+            else:
+                self.colliderect = ds.blit(self.Hero_Bare,(self.x,self.y))
         else:
-            if UI.GunPicked == 1:
-                self.colliderect = ds.blit(self.Hero_Pistol,(self.x,self.y))
-            elif UI.GunPicked == 2:
-                self.colliderect = ds.blit(self.Hero_Shotgun, (self.x, self.y))
-            elif UI.GunPicked == 3:
-                self.colliderect = ds.blit(self.Hero_Minigun, (self.x, self.y))
+            if(self.sAttck>0):
+                self.swordAttack(ds)
+            else:
+                if UI.GunPicked == 1:
+                    self.colliderect = ds.blit(self.Hero_Pistol,(self.x,self.y))
+                elif UI.GunPicked == 2:
+                    self.colliderect = ds.blit(self.Hero_Shotgun, (self.x, self.y))
+                elif UI.GunPicked == 3:
+                    self.colliderect = ds.blit(self.Hero_Minigun, (self.x, self.y))
             
 
             
@@ -528,7 +545,9 @@ while controls == True:
 
 player = Player()
 UI = UIClass()
-Message = StoryText("You have been sucked into the","Dark Wizards midevil world. ","Find and Defeat him to excape")
+Message2 = StoryText("Instructions: Use W,A,S,D key to","move around","Who said that??? enter to continue")
+Message = StoryText("Screw this sword I'm from Texas and","we always packing *pulls out revolver*"," enter to continue")
+Message1 = StoryText("Instructions: right click to attack"," enemies with your sword","enter to continue")
 textOn = False
 for num in range(map1.PickupDic["pAmmo"]):
     loot_dropper.dropped_list.append(["pAmmo",random.randint(0,ds_width-64),random.randint(0,ds_height-64),128,128])
@@ -537,7 +556,7 @@ for num in range(map1.PickupDic["sAmmo"]):
 for num in range(map1.PickupDic["mAmmo"]):
     loot_dropper.dropped_list.append(["mAmmo",random.randint(0,ds_width-64),random.randint(0,ds_height-64),128,128])
 for num in range(map1.PickupDic["miniGun"]):
-    loot_dropper.dropped_list.append(["miniGun",ds_width - 50,ds_height - 50,128,128])
+    loot_dropper.dropped_list.append(["miniGun",ds_width - 150,ds_height - 150,128,128])
 for num in range(map1.PickupDic["key"]):
     loot_dropper.dropped_list.append(["key",ds_width - 50,ds_height - 50,128,128])
 for num in range(map1.PickupDic["HP"]):
@@ -547,6 +566,7 @@ for num in range(map1.EnemyDic["Skeleton"]):
 for num in range(map1.EnemyDic["WizBoss"]):
     EnemyList.append(DarkWizard(shotDist = 350,shotTime = 300,sprite = DarkWizard1, health = 30))
 while play == True:
+
     SwordAttack = False
     dt = fps_clock.tick(60)
     if(SwordTimer > 0):
@@ -686,7 +706,7 @@ while play == True:
         for num in range(map1.PickupDic["mAmmo"]):
             loot_dropper.dropped_list.append(["mAmmo",random.randint(0,ds_width-64),random.randint(0,ds_height-64),128,128])
         for num in range(map1.PickupDic["miniGun"]):
-            loot_dropper.dropped_list.append(["miniGun",ds_width - 50,ds_height - 50,128,128])
+            loot_dropper.dropped_list.append(["miniGun",ds_width - 150,ds_height - 150,128,128])
         for num in range(map1.PickupDic["key"]):
             loot_dropper.dropped_list.append(["key",ds_width - 50,ds_height - 50,128,128])
         for num in range(map1.PickupDic["HP"]):
@@ -758,7 +778,7 @@ while play == True:
         for num in range(map1.PickupDic["mAmmo"]):
             loot_dropper.dropped_list.append(["mAmmo",random.randint(0,ds_width-64),random.randint(0,ds_height-64),128,128])
         for num in range(map1.PickupDic["miniGun"]):
-            loot_dropper.dropped_list.append(["miniGun",ds_width - 50,ds_height - 50,128,128])
+            loot_dropper.dropped_list.append(["miniGun",ds_width - 150,ds_height - 150,128,128])
         for num in range(map1.PickupDic["key"]):
             loot_dropper.dropped_list.append(["key",ds_width - 50,ds_height - 50,128,128])
         for num in range(map1.PickupDic["HP"]):
@@ -830,7 +850,7 @@ while play == True:
         for num in range(map1.PickupDic["mAmmo"]):
             loot_dropper.dropped_list.append(["mAmmo",random.randint(0,ds_width-64),random.randint(0,ds_height-64),128,128])
         for num in range(map1.PickupDic["miniGun"]):
-            loot_dropper.dropped_list.append(["miniGun",ds_width - 50,ds_height - 50,128,128])
+            loot_dropper.dropped_list.append(["miniGun",ds_width - 150,ds_height - 150,128,128])
         for num in range(map1.PickupDic["key"]):
             loot_dropper.dropped_list.append(["key",ds_width - 50,ds_height - 50,128,128])
         for num in range(map1.PickupDic["HP"]):
@@ -903,7 +923,7 @@ while play == True:
         for num in range(map1.PickupDic["mAmmo"]):
             loot_dropper.dropped_list.append(["mAmmo",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
         for num in range(map1.PickupDic["miniGun"]):
-            loot_dropper.dropped_list.append(["miniGun",ds_width - 50,ds_height - 50,128,128])
+            loot_dropper.dropped_list.append(["miniGun",ds_width - 150,ds_height - 150,128,128])
         for num in range(map1.PickupDic["key"]):
             loot_dropper.dropped_list.append(["key",ds_width - 50,ds_height - 50,128,128])
         for num in range(map1.PickupDic["HP"]):
@@ -952,18 +972,19 @@ while play == True:
             #mm1,mm2,mm3 = pygame
             if m1:
                 angle = math.atan2((my - player.y),(mx - player.x))
-                if UI.PSLeft > 0 and UI.GunPicked == 1:
-                    UI.ShootGun()
-                    #if player.canShoot and player.BulletCount > 0:
-                    BulletList.append(Shoot(player.x, player.y, angle))
-                    #player.gunUpdate()
-                if UI.SSLeft > 0 and UI.GunPicked == 2:
-                    UI.ShootGun()
-                    BulletList.append(ShotGunShoot(player.x, player.y,angle))
-                    BulletList.append(ShotGunShoot(player.x, player.y,angle+0.2))
-                    BulletList.append(ShotGunShoot(player.x, player.y, angle-0.2))
-                if UI.MBLeft > 0 and UI.GunPicked == 3:
-                    minigunshotting = True
+                if player.swordOnly == False:
+                    if UI.PSLeft > 0 and UI.GunPicked == 1:
+                        UI.ShootGun()
+                        #if player.canShoot and player.BulletCount > 0:
+                        BulletList.append(Shoot(player.x, player.y, angle))
+                        #player.gunUpdate()
+                    if UI.SSLeft > 0 and UI.GunPicked == 2:
+                        UI.ShootGun()
+                        BulletList.append(ShotGunShoot(player.x, player.y,angle))
+                        BulletList.append(ShotGunShoot(player.x, player.y,angle+0.2))
+                        BulletList.append(ShotGunShoot(player.x, player.y, angle-0.2))
+                    if UI.MBLeft > 0 and UI.GunPicked == 3:
+                        minigunshotting = True
                     
 
             if m2:
@@ -1027,6 +1048,8 @@ while play == True:
             if item[0] == "HP":
                 if UI.health < 6:
                     UI.health += 1
+                    if UI.health < 6:
+                        UI.health += 1
                 DropRemoveList.append(item)
             elif item[0] == "pAmmo":
                 UI.add_pistol_ammo()
@@ -1037,8 +1060,10 @@ while play == True:
             elif item[0] == "mAmmo":
                 #TODO: add UI.add_minigun_ammo()
                 DropRemoveList.append(item)
-            elif item[0] == "mini":
+            elif item[0] == "miniGun":
                 #TODO: add mini gun to wepons list
+                UI.MiniGun = True
+                loot_dropper.items.append("mAmmo")
                 DropRemoveList.append(item)
             elif item[0] == "key":
                 #TODO: add key to invitory
@@ -1057,8 +1082,8 @@ while play == True:
 
     for enemy in EnemyRemoveList:
         if enemy in EnemyList:
-            drop = random.randint(1, 5)
-            if drop == 3:
+            drop = random.randint(1, 2)
+            if drop == 1:
                 loot_dropper.drop(enemy.x, enemy.y)
             EnemyList.remove(enemy)
 
@@ -1085,9 +1110,45 @@ while play == True:
                 if UI.reload_time < 0:
                     UI.auto_minigun_reload()
 
-
-
-   
+    if(RoomCol == 1 and RoomRow == 1):
+        while(Instructions == True):
+            pygame.event.pump()
+            keys=pygame.key.get_pressed()
+            map1.render()
+            loot_dropper.render(ds)
+            player.render(ds)
+            UI.render()
+            Message2.render()
+            pygame.display.update()
+            if(keys[pygame.K_RETURN]):
+                Instructions = False
+    elif(RoomCol == 2 and RoomRow == 1):
+        while(SwordInstructions == True):
+            pygame.event.pump()
+            keys=pygame.key.get_pressed()
+            map1.render()
+            loot_dropper.render(ds)
+            player.render(ds)
+            UI.render()
+            Message1.render()
+            pygame.display.update()
+            if(keys[pygame.K_RETURN]):
+                SwordInstructions = False
+    elif(RoomCol == 2 and RoomRow == 2 and player.swordOnly == True):
+        while(PistalInstructions == True):
+            pygame.event.pump()
+            keys=pygame.key.get_pressed()
+            map1.render()
+            loot_dropper.render(ds)
+            player.render(ds)
+            UI.render()
+            Message.render()
+            pygame.display.update()
+            if(keys[pygame.K_RETURN]):
+                PistalInstructions = False
+        loot_dropper.items.append("pAmmo")
+        UI.pistel = True
+        player.swordOnly = False
     if textOn:
         Message.render()
     UI.render()

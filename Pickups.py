@@ -6,7 +6,8 @@ class Pickup(object):
         self.Health = pygame.image.load("Sprites\\Heart_2.png")
         self.Pistol = pygame.image.load("Sprites\\UIBullet.png")
         self.Shotgun = pygame.image.load("Sprites\\UIShell.png")
-        self.items = ["HP", "pAmmo", "sAmmo"]
+        self.minigun = pygame.image.load("Sprites\\MiniGun.png")
+        self.items = ["HP"]
         self.dropped_list = []
         self.width = 128
         self.height = 128
@@ -23,4 +24,6 @@ class Pickup(object):
                 ds.blit(self.Pistol, (item[1], item[2]))
             if item[0] == "sAmmo":
                 ds.blit(self.Shotgun, (item[1], item[2]))
+            if item[0] == "miniGun":
+                ds.blit(self.minigun, (item[1], item[2]))
 
