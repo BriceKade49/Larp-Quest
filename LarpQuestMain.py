@@ -76,6 +76,9 @@ minigunshotting = False
 SwordInstructions = True
 PistalInstructions = True
 Instructions = True
+ShotgunInstructions1 = True
+ShotgunInstructions2 = True
+
 map1=tileMapModule.Tilemap(renderSurface=ds)
 map1.fromFile("R1C1")
 RoomCol= 1
@@ -545,6 +548,8 @@ while controls == True:
 
 player = Player()
 UI = UIClass()
+Message3 = StoryText("Old Lady: Oh its you from the trailer.","If you want to get out of here you","are going to need to get")
+Message4 = StoryText("the key to the Dark Wizards catsle.","Its deep in the undead grave yard","enter to continue")
 Message2 = StoryText("Instructions: Use W,A,S,D key to","move around","Who said that??? enter to continue")
 Message = StoryText("Screw this sword I'm from Texas and","we always packing *pulls out revolver*"," enter to continue")
 Message1 = StoryText("Instructions: right click to attack"," enemies with your sword","enter to continue")
@@ -560,13 +565,12 @@ for num in range(map1.PickupDic["miniGun"]):
 for num in range(map1.PickupDic["key"]):
     loot_dropper.dropped_list.append(["key",ds_width - 50,ds_height - 50,128,128])
 for num in range(map1.PickupDic["HP"]):
-        loot_dropper.dropped_list.append(["HP",random.randint(0,ds_width-64),random.randint(0,ds_height-64),128,128])
+    loot_dropper.dropped_list.append(["HP",random.randint(0,ds_width-64),random.randint(0,ds_height-64),128,128])
 for num in range(map1.EnemyDic["Skeleton"]):
     EnemyList.append(SkelingtonSpawner())
 for num in range(map1.EnemyDic["WizBoss"]):
     EnemyList.append(DarkWizard(shotDist = 350,shotTime = 300,sprite = DarkWizard1, health = 30))
 while play == True:
-
     SwordAttack = False
     dt = fps_clock.tick(60)
     if(SwordTimer > 0):
@@ -692,11 +696,12 @@ while play == True:
         map1.EnemyDic["Skeleton"] = s
         map1.EnemyDic["WizBoss"] = w
 
-        map1.toFile("NewRooms//"+oldRoom+".map",EnemyList)
+        map1.toFile("NewRooms//"+oldRoom+".map")
         ArrowList = []
         #Pickup saving
-        for item in loot_dropper.dropped_list:
-            DropRemoveList.append(item)
+        #for item in loot_dropper.dropped_list:
+          #  DropRemoveList.append(item)
+        loot_dropper.dropped_list = []
         map1.fromFile(newRoom)
         
         for num in range(map1.PickupDic["pAmmo"]):
@@ -765,10 +770,11 @@ while play == True:
         map1.EnemyDic["Skeleton"] = s
         map1.EnemyDic["WizBoss"] = w
 
-        map1.toFile("NewRooms//"+oldRoom+".map",EnemyList)
+        map1.toFile("NewRooms//"+oldRoom+".map")
         ArrowList = []
-        for item in loot_dropper.dropped_list:
-            DropRemoveList.append(item)
+        #for item in loot_dropper.dropped_list:
+          #  DropRemoveList.append(item)
+        loot_dropper.dropped_list = []
         map1.fromFile(newRoom)
 
         for num in range(map1.PickupDic["pAmmo"]):
@@ -837,10 +843,11 @@ while play == True:
         map1.EnemyDic["Skeleton"] = s
         map1.EnemyDic["WizBoss"] = w
 
-        map1.toFile("NewRooms//"+oldRoom+".map",EnemyList)
+        map1.toFile("NewRooms//"+oldRoom+".map")
         ArrowList = []
-        for item in loot_dropper.dropped_list:
-            DropRemoveList.append(item)
+           #for item in loot_dropper.dropped_list:
+          #  DropRemoveList.append(item)
+        loot_dropper.dropped_list = []
         map1.fromFile(newRoom)
 
         for num in range(map1.PickupDic["pAmmo"]):
@@ -910,10 +917,11 @@ while play == True:
         map1.EnemyDic["Skeleton"] = s
         map1.EnemyDic["WizBoss"] = w
 
-        map1.toFile("NewRooms//"+oldRoom+".map",EnemyList)
+        map1.toFile("NewRooms//"+oldRoom+".map")
         ArrowList = []
-        for item in loot_dropper.dropped_list:
-            DropRemoveList.append(item)
+        #for item in loot_dropper.dropped_list:
+          #  DropRemoveList.append(item)
+        loot_dropper.dropped_list = []
         map1.fromFile(newRoom)
 
         for num in range(map1.PickupDic["pAmmo"]):
@@ -1115,7 +1123,6 @@ while play == True:
             pygame.event.pump()
             keys=pygame.key.get_pressed()
             map1.render()
-            loot_dropper.render(ds)
             player.render(ds)
             UI.render()
             Message2.render()
@@ -1127,7 +1134,6 @@ while play == True:
             pygame.event.pump()
             keys=pygame.key.get_pressed()
             map1.render()
-            loot_dropper.render(ds)
             player.render(ds)
             UI.render()
             Message1.render()
@@ -1139,7 +1145,6 @@ while play == True:
             pygame.event.pump()
             keys=pygame.key.get_pressed()
             map1.render()
-            loot_dropper.render(ds)
             player.render(ds)
             UI.render()
             Message.render()
@@ -1149,6 +1154,31 @@ while play == True:
         loot_dropper.items.append("pAmmo")
         UI.pistel = True
         player.swordOnly = False
+    elif(RoomCol == 5 and RoomRow == 5 and UI.ShotGun == False):
+        while(ShotgunInstructions1 == True):
+            pygame.event.pump()
+            keys=pygame.key.get_pressed()
+            map1.render()
+            loot_dropper.render(ds)
+            player.render(ds)
+            UI.render()
+            Message3.render()
+            pygame.display.update()
+            if(keys[pygame.K_RETURN]):
+                ShotgunInstructions1 = False
+        while(ShotgunInstructions2 == True):
+            pygame.event.pump()
+            keys=pygame.key.get_pressed()
+            map1.render()
+            loot_dropper.render(ds)
+            player.render(ds)
+            UI.render()
+            Message4.render()
+            pygame.display.update()
+            if(keys[pygame.K_RETURN]):
+                ShotgunInstructions2 = False
+        loot_dropper.items.append("sAmmo")
+        UI.ShotGun = True
     if textOn:
         Message.render()
     UI.render()

@@ -151,7 +151,7 @@ class Tilemap(object):
         if mapstring!="":
             self.fromString(mapstring.strip())
         
-    def toFile(self,filename,EnemyList):
+    def toFile(self,filename):
         '''save the tilemap into the file that is specified by the filename.'''
         maplines=[]
         for row in range(0,self.tileMapHeight):

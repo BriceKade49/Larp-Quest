@@ -4,6 +4,7 @@ tileWidth=32
 tileHeight=32
 badTileColor=(255, 100, 200)
 EnemyDic={"Skeleton": 5, "WizBoss": 0}
+PickupDic={"pAmmo": 0, "sAmmo": 0, "mAmmo": 0, "miniGun": 0, "key": 0, "HP": 0}
 tileMapLine=TLFTFTFTFTFTFTFTFTFTFTFTFTFTFTFTFTFTFTTR
 tileMapLine=FLG1G1G1G1G1G1G1G1G1G1G1G1G1G1G1G1G1G1FR
 tileMapLine=FLG1G1G1G1G1G1G1G1G1G1G1G1G1G1G1G1G1G1FR
