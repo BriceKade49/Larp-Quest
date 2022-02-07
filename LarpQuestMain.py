@@ -7,6 +7,7 @@ import Pickups
 import gui_elements
 import os
 import shutil
+import time
 
 # fetch all files
 for file_name in os.listdir(r"Rooms\\"):
@@ -67,7 +68,7 @@ StoryText = pygame.font.SysFont("Fonts\\Cardinal.ttf", 100)
 reloadFont = pygame.font.SysFont("Fonts\\Cardinal.ttf", 40)
 loot_dropper = Pickups.Pickup()
 fps_clock=pygame.time.Clock()
-time = 0
+time1 = 0
 miniGunTimer = 0
 TitleScreen = True
 play = False
@@ -324,10 +325,10 @@ class SkelingtonSpawner(object):
         elif px >= self.x and self.flipE == False:
                 self.flipE = True
                 self.sprite = pygame.transform.flip(self.sprite,True,False)
-        if distance <= self.shotDist and time % self.shotTime == 0:
+        if distance <= self.shotDist and time1 % self.shotTime == 0:
             self.shot()
         if isinstance(self, DarkWizard):
-            if distance <= self.shotDist and time % 800 == 0:
+            if distance <= self.shotDist and time1 % 800 == 0:
                 self.spawn()
     def render(self,px,py):
             self.collide = ds.blit(self.sprite,(self.x,self.y))
@@ -354,6 +355,7 @@ class Player(object):
         self.flip = None
         self.sAttck = 0
         self.swordOnly = True
+        self.hasKey = False
 
     def move(self, keys,dt,mx):
         if mx > self.x:
@@ -575,7 +577,7 @@ while play == True:
     dt = fps_clock.tick(60)
     if(SwordTimer > 0):
         SwordTimer-=dt
-    time += 1
+    time1 += 1
     mx, my = pygame.mouse.get_pos()
     #ds.blit(BackgroundImage,(0,0))  
     map1.render()
@@ -713,7 +715,7 @@ while play == True:
         for num in range(map1.PickupDic["miniGun"]):
             loot_dropper.dropped_list.append(["miniGun",ds_width - 150,ds_height - 150,128,128])
         for num in range(map1.PickupDic["key"]):
-            loot_dropper.dropped_list.append(["key",ds_width - 50,ds_height - 50,128,128])
+            loot_dropper.dropped_list.append(["key",ds_width - 150,150,128,128])
         for num in range(map1.PickupDic["HP"]):
             loot_dropper.dropped_list.append(["HP",random.randint(0,ds_width-64),random.randint(0,ds_height-64),128,128])
         
@@ -725,7 +727,7 @@ while play == True:
         for num in range(map1.EnemyDic["WizBoss"]):
             EnemyList.append(DarkWizard())
         
-        player.x = 4*(ds_width/6)
+        player.x = ds_width-100
         player.y = ds_height/2-50
         RoomRow += 1
     if player.x >= ds_width:
@@ -786,7 +788,7 @@ while play == True:
         for num in range(map1.PickupDic["miniGun"]):
             loot_dropper.dropped_list.append(["miniGun",ds_width - 150,ds_height - 150,128,128])
         for num in range(map1.PickupDic["key"]):
-            loot_dropper.dropped_list.append(["key",ds_width - 50,ds_height - 50,128,128])
+            loot_dropper.dropped_list.append(["key",ds_width - 150,150,128,128])
         for num in range(map1.PickupDic["HP"]):
             loot_dropper.dropped_list.append(["HP",random.randint(0,ds_width-64),random.randint(0,ds_height-64),128,128])
         
@@ -798,7 +800,7 @@ while play == True:
         for num in range(map1.EnemyDic["WizBoss"]):
             EnemyList.append(DarkWizard(shotDist = 350,shotTime = 300,sprite = DarkWizard1, health = 30))
             
-        player.x = ds_width/6
+        player.x = 50
         player.y = ds_height/2-50
         RoomRow -= 1
     if player.y <= 0:
@@ -859,7 +861,7 @@ while play == True:
         for num in range(map1.PickupDic["miniGun"]):
             loot_dropper.dropped_list.append(["miniGun",ds_width - 150,ds_height - 150,128,128])
         for num in range(map1.PickupDic["key"]):
-            loot_dropper.dropped_list.append(["key",ds_width - 50,ds_height - 50,128,128])
+            loot_dropper.dropped_list.append(["key",ds_width - 150,150,128,128])
         for num in range(map1.PickupDic["HP"]):
             loot_dropper.dropped_list.append(["HP",random.randint(0,ds_width-64),random.randint(0,ds_height-64),128,128])
         
@@ -933,7 +935,7 @@ while play == True:
         for num in range(map1.PickupDic["miniGun"]):
             loot_dropper.dropped_list.append(["miniGun",ds_width - 150,ds_height - 150,128,128])
         for num in range(map1.PickupDic["key"]):
-            loot_dropper.dropped_list.append(["key",ds_width - 50,ds_height - 50,128,128])
+            loot_dropper.dropped_list.append(["key",ds_width - 150,150,128,128])
         for num in range(map1.PickupDic["HP"]):
             loot_dropper.dropped_list.append(["HP",random.randint(0,ds_width),random.randint(0,ds_height),128,128])
         
@@ -1067,6 +1069,7 @@ while play == True:
                 DropRemoveList.append(item)
             elif item[0] == "mAmmo":
                 #TODO: add UI.add_minigun_ammo()
+                UI.add_minigun_ammo()
                 DropRemoveList.append(item)
             elif item[0] == "miniGun":
                 #TODO: add mini gun to wepons list
@@ -1075,6 +1078,7 @@ while play == True:
                 DropRemoveList.append(item)
             elif item[0] == "key":
                 #TODO: add key to invitory
+                player.hasKey = True
                 DropRemoveList.append(item)
 
                 
@@ -1166,16 +1170,17 @@ while play == True:
             pygame.display.update()
             if(keys[pygame.K_RETURN]):
                 ShotgunInstructions1 = False
+        time.sleep(1)#fix this  better way with keys and stuff
         while(ShotgunInstructions2 == True):
             pygame.event.pump()
-            keys=pygame.key.get_pressed()
+            key=pygame.key.get_pressed()
             map1.render()
             loot_dropper.render(ds)
             player.render(ds)
             UI.render()
             Message4.render()
             pygame.display.update()
-            if(keys[pygame.K_RETURN]):
+            if(key[pygame.K_RETURN]):
                 ShotgunInstructions2 = False
         loot_dropper.items.append("sAmmo")
         UI.ShotGun = True
