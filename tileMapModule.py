@@ -9,7 +9,7 @@ class Tile(object):
         self.collides=collides
 
 class Tilemap(object):
-    def __init__(self,renderSurface,tileMapWidth=25,tileMapHeight=18,tileWidth=32,tileHeight=32):
+    def __init__(self,renderSurface,tileMapWidth=25,tileMapHeight=18,tileWidth=64,tileHeight=64):
         self.renderSurface=renderSurface
         self.tileMapWidth=tileMapWidth
         self.tileMapHeight=tileMapHeight

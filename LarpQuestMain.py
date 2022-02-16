@@ -79,6 +79,8 @@ PistalInstructions = True
 Instructions = True
 ShotgunInstructions1 = True
 ShotgunInstructions2 = True
+WizardTalk = True
+WizardTalk2 = True
 
 map1=tileMapModule.Tilemap(renderSurface=ds)
 map1.fromFile("R1C1")
@@ -90,7 +92,7 @@ RoomRow= 1
 class StoryText(object):
     def __init__(self,FirstText,SecondText,ThirdText):
         self.x = ds_height/19
-        self.y = 13*(ds_height/20)
+        self.y = 2*(ds_height/20)
         self.firstText = FirstText
         self.secondText = SecondText
         self.thirdText = ThirdText
@@ -99,11 +101,11 @@ class StoryText(object):
         Text2 = reloadFont.render(self.firstText, 0, (56, 55, 53))
         Text = reloadFont.render(self.secondText, 0, (56, 55, 53))
         Text3 = reloadFont.render(self.thirdText, 0, (56, 55, 53))
-        ds.blit(Text,(ds_height-13*(ds_width/15),ds_height-5*(ds_height/20)))
-        ds.blit(Text2,(ds_height-13*(ds_width/15),ds_height-5*(ds_height/17)))
-        ds.blit(Text3,(ds_height-13*(ds_width/15),ds_height-5*(ds_height/25)))
+        ds.blit(Text,(ds_height-13*(ds_width/15),130))
+        ds.blit(Text2,(ds_height-13*(ds_width/15),100))
+        ds.blit(Text3,(ds_height-13*(ds_width/15),160))
 class UIClass(object):
-    def __init__(self, pistol_bullet_count=100, pistol_mag_size=6, shotgun_shell_count = 100, shotgun_mag_size = 2, minigun_mag_size = 16, minigun_bullet_count = 50, reload_time=200, Health=6, GunPicked=1):
+    def __init__(self, pistol_bullet_count=25, pistol_mag_size=6, shotgun_shell_count = 25, shotgun_mag_size = 2, minigun_mag_size = 16, minigun_bullet_count = 25, reload_time=100, Health=6, GunPicked=1):
         self.PBCount = pistol_bullet_count
         self.PMSize = pistol_mag_size
         self.PSLeft = pistol_mag_size
@@ -262,7 +264,48 @@ class UIClass(object):
         if self.health == 1:
             ds.blit(Heart_1,(0,0))
         if self.health == 0:
+            Dead = True
+            DeadMenu = Menu(Main_Menu, Logo, menu_font,"Play Again","Main Menu","Quit")
+           # while Dead == True:
+           #     cur_event = pygame.event.poll()
+                # event-handling
+            #    if cur_event.type == pygame.QUIT:
+            #        pygame.display.quit()
+             #   elif cur_event.type == pygame.KEYDOWN:
+            #        if cur_event.key == pygame.K_ESCAPE:
+            #            pygame.display.quit()
+#
+            #    mx, my = pygame.mouse.get_pos()
+           #     box1, box2, box3 = DeadMenu.boxlist
+           #     if cur_event.type == pygame.MOUSEBUTTONDOWN:
+           #         if box1.mArea.collidepoint(mx, my):
+          #              for file_name in os.listdir(r"Rooms\\"):
+           #                 # construct full file path
+           #                 source = r"Rooms\\" + file_name
+           #                 destination = r"NewRooms\\" + file_name
+                            # copy only files
+           #                 if os.path.isfile(source):
+           #                     shutil.copy(source, destination)
+                                #print('copied', file_name)
+           #             map1.fromFile("R1C1")
+           #             RoomCol= 1
+            #            RoomRow= 1
+            #            Dead = False
+           #         if box2.mArea.collidepoint(mx, my):
+            #            controls = True
+            ##            Dead = False
+            #        if box3.mArea.collidepoint(mx, my):
+             #           break
+
+             #   DeadMenu.update(mx, my)
+              #  DeadMenu.render(ds)
+
+             #   pygame.display.update()
+                
             #quit game
+            #
+            #global play
+            #play = False
             #pygame.display.quit()
             pass
 
@@ -288,8 +331,8 @@ class Arrow(object):
         #pygame.draw.circle(ds,(255,255,255),(int(self.x+self.width/2),int(self.y+self.height/2)),15)
 class SkelingtonSpawner(object):
     def __init__(self,x = random.randint(100,500),y = random.randint(100,500) ,speed = 10, shotDist = 200, shotTime = 100,sprite = Skeliton,health = 3):
-        self.x = random.randint(0,ds_width)
-        self.y = random.randint(0,ds_height)
+        self.x = random.randint(100,ds_width-100)
+        self.y = random.randint(100,ds_height-100)
         self.speed = speed
         self.EV = vector.Vector2(self.x,self.y)
         self.VP = vector.Vector2(px,py)
@@ -328,7 +371,7 @@ class SkelingtonSpawner(object):
         if distance <= self.shotDist and time1 % self.shotTime == 0:
             self.shot()
         if isinstance(self, DarkWizard):
-            if distance <= self.shotDist and time1 % 800 == 0:
+            if distance <= self.shotDist and time1 % 600 == 0:
                 self.spawn()
     def render(self,px,py):
             self.collide = ds.blit(self.sprite,(self.x,self.y))
@@ -459,14 +502,17 @@ class DarkWizard(SkelingtonSpawner):
         pygame.draw.rect(ds,(255,0,0),(250,10,self.health*10,20))
         self.collide = ds.blit(self.sprite,(self.x,self.y))
 class Menu(object):
-    def __init__(self, screen, logo, font):
+    def __init__(self, screen, logo, font,box1,box2,box3):
+        self.box1 = box1
+        self.box2 = box2
+        self.box3 = box3
         self.screen = screen
         self.logo = logo
         self.font = font
         self.color = (0, 0, 255)
-        tempplay = self.font.render("PLAY", False, (255, 255, 255))
-        tempcontrols = self.font.render("CONTROLS", False, (255, 255, 255))
-        tempquit = self.font.render("QUIT", False, (255, 255, 255))
+        tempplay = self.font.render(self.box1, False, (255, 255, 255))
+        tempcontrols = self.font.render(self.box2, False, (255, 255, 255))
+        tempquit = self.font.render(self.box3, False, (255, 255, 255))
         self.menulist = [tempplay, tempcontrols, tempquit]
         self.boxwidth = 0
         self.boxheight = 0
@@ -478,14 +524,14 @@ class Menu(object):
         self.boxlist = []
         x = (self.screen.get_width() / 2) - (self.boxwidth / 2)
         y = 350
-        text = "play"
+        text = self.box1
         for i in range(len(self.menulist)):
             self.boxlist.append(gui_elements.Element(x, y, self.boxwidth, self.boxheight, self.color, text, self.font, (255, 255, 255)))
             y += 75
-            if text == "play":
-                text = "controls"
-            elif text == "controls":
-                text = "quit"
+            if text == self.box1:
+                text = self.box2
+            elif text == self.box2:
+                text = self.box3
 
 
     def update(self, mx, my):
@@ -501,7 +547,7 @@ class Menu(object):
         for box in self.boxlist:
             box.draw(surface)
 
-screen = Menu(Main_Menu, Logo, menu_font)
+screen = Menu(Main_Menu, Logo, menu_font,"Play","Controls","Quit")
 while TitleScreen == True:
     cur_event = pygame.event.poll()
     # event-handling
@@ -550,6 +596,9 @@ while controls == True:
 
 player = Player()
 UI = UIClass()
+Message5 = StoryText("Dark Wizard: Defeated my minions I see.","No matter you stand no chance this","is my world")
+Message6 = StoryText("Dark Wizard: You beat me this cannot be","Hero: Now get me out of here","Dark Wizard: Okay Okay take this")
+
 Message3 = StoryText("Old Lady: Oh its you from the trailer.","If you want to get out of here you","are going to need to get")
 Message4 = StoryText("the key to the Dark Wizards catsle.","Its deep in the undead grave yard","enter to continue")
 Message2 = StoryText("Instructions: Use W,A,S,D key to","move around","Who said that??? enter to continue")
@@ -615,6 +664,30 @@ while play == True:
         player.y = old_y
         
     if "WW" in map1.checkTileMapCollision(player.x, player.y + 50, 10, 32):
+        player.x = old_x
+        player.y = old_y
+        
+    if "B1" in map1.checkTileMapCollision(player.x + 50, player.y, 32, 64):
+        player.x = old_x
+        player.y = old_y
+        
+    if "B1" in map1.checkTileMapCollision(player.x, player.y + 50, 64, 64):
+        player.x = old_x
+        player.y = old_y
+
+    if "B1" in map1.checkTileMapCollision(player.x + 50, player.y + 50, 10, 32):
+        player.x = old_x
+        player.y = old_y
+        
+    if "B1" in map1.checkTileMapCollision(player.x + 50, player.y + 50, 32, 32):
+        player.x = old_x
+        player.y = old_y
+        
+    if "B2" in map1.checkTileMapCollision(player.x + 50, player.y + 50, 10, 32):
+        player.x = old_x
+        player.y = old_y
+
+    if "BB" in map1.checkTileMapCollision(player.x + 50, player.y + 50, 32, 32):
         player.x = old_x
         player.y = old_y
 
@@ -701,7 +774,7 @@ while play == True:
         map1.toFile("NewRooms//"+oldRoom+".map")
         ArrowList = []
         #Pickup saving
-        #for item in loot_dropper.dropped_list:
+       #for item in loot_dropper.dropped_list:
           #  DropRemoveList.append(item)
         loot_dropper.dropped_list = []
         map1.fromFile(newRoom)
@@ -875,7 +948,7 @@ while play == True:
             EnemyList.append(DarkWizard(shotDist = 350,shotTime = 300,sprite = DarkWizard1, health = 30))
             
         player.x = ds_width/2-50
-        player.y = (ds_height/10)*9
+        player.y = ds_height-200
         RoomCol += 1
     if player.y >= ds_height:
         oldRoom = ("R"+str(RoomRow)+"C"+str(RoomCol))
@@ -950,7 +1023,7 @@ while play == True:
             EnemyList.append(DarkWizard(shotDist = 350,shotTime = 300,sprite = DarkWizard1, health = 30))
             
         player.x = ds_width/2 - 50
-        player.y = (ds_height/10)
+        player.y = 200
         RoomCol -= 1
     for events in pygame.event.get():
         if events.type == pygame.QUIT:
@@ -958,16 +1031,10 @@ while play == True:
         if events.type == pygame.KEYDOWN: 
             if keys[pygame.K_ESCAPE]:
                 play = False
-            if keys[pygame.K_m]:
-                if textOn:
-                    textOn = False
-                elif textOn == False:
-                    textOn = True
-                Message.render()
             if keys[pygame.K_k]:
                 EnemyList.append(SkelingtonSpawner())
-            if keys[pygame.K_t]:
-                 EnemyList.append(DarkWizard(shotDist = 350,shotTime = 300,sprite = DarkWizard1, health = 30))
+            #if keys[pygame.K_t]:
+               #  EnemyList.append(DarkWizard(shotDist = 350,shotTime = 300,sprite = DarkWizard1, health = 30))
             if keys[pygame.K_r]:
                 if UI.reload_time == UI.wait_time:
                     UI.self_reload()
@@ -1079,6 +1146,13 @@ while play == True:
             elif item[0] == "key":
                 #TODO: add key to invitory
                 player.hasKey = True
+                os.remove("NewRooms\\R5C5.map")
+                source = "Rooms\\R5C52.map"
+                destination = "NewRooms\\R5C5.map"
+                # copy only files
+                if os.path.isfile(source):
+                    shutil.copy(source, destination)
+                    #print('copied', file_name)
                 DropRemoveList.append(item)
 
                 
@@ -1094,8 +1168,22 @@ while play == True:
 
     for enemy in EnemyRemoveList:
         if enemy in EnemyList:
-            drop = random.randint(1, 2)
-            if drop == 1:
+            if enemy.__class__ == DarkWizard:
+                while True:
+                    pygame.event.pump()
+                    key=pygame.key.get_pressed()
+                    map1.render()
+                    loot_dropper.render(ds)
+                    player.render(ds)
+                    UI.render()
+                    Message6.render()
+                    pygame.display.update()
+                    if(key[pygame.K_RETURN]):
+                        print("you win")
+                        play = False
+                        break
+            drop = random.randint(0, 100)
+            if drop >= 25:
                 loot_dropper.drop(enemy.x, enemy.y)
             EnemyList.remove(enemy)
 
@@ -1184,8 +1272,21 @@ while play == True:
                 ShotgunInstructions2 = False
         loot_dropper.items.append("sAmmo")
         UI.ShotGun = True
-    if textOn:
-        Message.render()
+    elif(RoomCol == 6 and RoomRow == 5):
+        while(WizardTalk == True):
+            pygame.event.pump()
+            keys=pygame.key.get_pressed()
+            map1.render()
+            loot_dropper.render(ds)
+            player.render(ds)
+            UI.render()
+            Message5.render()
+            pygame.display.update()
+            if(keys[pygame.K_RETURN]):
+                WizardTalk = False
+        #time.sleep(1)#fix this  better way with keys and stuff
+     
+
     UI.render()
     #pygame.draw.rect(ds,(255,0,0),player.colliderect)
     pygame.display.update()
